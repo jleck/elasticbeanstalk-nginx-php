@@ -5,7 +5,7 @@ sudo yum -y remove httpd httpd-tools
 sudo yum -y remove php-cli php-common php 
 
 # Install PHP5.4 (with httpd2.4 as dep)
-sudo yum install php54* --exclude=php54-mysqlnd 
+sudo yum -y install php54* --exclude=php54-mysqlnd 
 
 # Install Nginx
 sudo yum -y install nginx
