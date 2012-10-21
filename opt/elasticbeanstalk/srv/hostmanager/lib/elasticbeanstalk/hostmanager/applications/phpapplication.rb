@@ -155,12 +155,12 @@ module ElasticBeanstalk
           HostManager.log "Output: #{output}"
           raise "Unable to set final mode of application files deployed to #{PHPApplication.web_root_dir}" if $?.exitstatus != 0
 
-          if File.exist?("#{PHPApplication.deploy_dir}/deploy.sh")
-            output = `/usr/bin/sudo chmod +x #{PHPApplication.deploy_dir}/deploy.sh`
+          if File.exist?("#{PHPApplication.web_root_dir}/deploy.sh")
+            output = `/usr/bin/sudo chmod +x #{PHPApplication.web_root_dir}/deploy.sh`
             HostManager.log "Output: #{output}"
-            output = `/usr/bin/sudo #{PHPApplication.deploy_dir}/deploy.sh`
+            output = `#{PHPApplication.web_root_dir}/deploy.sh`
             HostManager.log "Output: #{output}"
-            raise "Unable to run deployment script" if File.exists?("#{PHPApplication.deploy_dir}/deploy.sh")
+            raise "Unable to run deployment script" if File.exists?("#{PHPApplication.web_root_dir}/deploy.sh")
           end
 
           ElasticBeanstalk::HostManager::Utils::BluepillUtil.start_target("fpm") if @is_initialization_phase
