@@ -4,6 +4,8 @@
 
 By default PHP on Elastic Beanstalk runs on Apache, which is also a dependancy of Hostmanager. The goal of this project is to provide an easy way to replace Apache with Nginx and PHP-FPM. Simply transfer build.sh onto a fresh Beanstalk AMI instance, and run using sudo.
 
+Now updated to PHP 5.4 thanks to Rubas (https://github.com/rubas)!
+
 ## Why?
 
 Elastic Beanstalk is a great service, but as the concurrency increases, apache chews up a lot of resources. Nginx with php-fpm is a lethal combination for a dynamic web server, and perfect for large scale websites.
