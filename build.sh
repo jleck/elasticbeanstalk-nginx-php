@@ -1,37 +1,37 @@
 #!/bin/bash
 
 # Remove Apache2.2 and PHP5.3
-sudo yum -y remove httpd httpd-tools
-sudo yum -y remove php-cli php-common php 
+yum -y remove httpd httpd-tools
+yum -y remove php-cli php-common php 
 
 # Install PHP5.4 (with httpd2.4 as dep)
-sudo yum -y install php54* --exclude=php54-mysqlnd 
+yum -y install php54* --exclude=php54-mysqlnd 
 
 # Install Nginx
-sudo yum -y install nginx
-sudo rm -rf /etc/nginx/conf.d/*
-sudo chkconfig nginx off
+yum -y install nginx
+rm -rf /etc/nginx/conf.d/*
+chkconfig nginx off
 
 # Install PHP-FPM
-sudo yum -y install php54-fpm 
-sudo chkconfig php-fpm off
+yum -y install php54-fpm 
+chkconfig php-fpm off
 
 # Update all packages
-sudo yum -y update
+yum -y update
 
 # Overwrite files in /etc and /opt
-sudo mkdir /tmp/build
-sudo git clone git://github.com/rubas/elasticbeanstalk-nginx-php.git /tmp/build
-sudo cp -rf /tmp/build/etc /
-sudo cp -rf /tmp/build/opt /
+mkdir /tmp/build
+git clone git://github.com/rubas/elasticbeanstalk-nginx-php.git /tmp/build
+cp -rf /tmp/build/etc /
+cp -rf /tmp/build/opt /
 
 # Install Composer
 cd /tmp/
-sudo curl -s http://getcomposer.org/installer | php
-sudo mv composer.phar /usr/bin/composer
+curl -s http://getcomposer.org/installer | php
+mv composer.phar /usr/bin/composer
 
 # Take ownership
-sudo chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
+chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
                                            /opt/elasticbeanstalk \
                                            /usr/bin/composer \
                                            /var/log/nginx \
@@ -39,7 +39,7 @@ sudo chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
 
 
 # Clear unneeded files
-sudo rm -rf /etc/httpd \
+rm -rf /etc/httpd \
        /opt/elasticbeanstalk/var/log/* \
        /tmp/build \
        /var/log/httpd \
@@ -47,4 +47,4 @@ sudo rm -rf /etc/httpd \
        /var/log/php-fpm/*
 
 # Clear root history
-sudo history -c
+history -c
