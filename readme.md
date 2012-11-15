@@ -8,7 +8,7 @@ Now updated to PHP 5.4 thanks to Rubas (https://github.com/rubas)!
 
 ## Why?
 
-Elastic Beanstalk is a great service, but as the concurrency increases, apache chews up a lot of resources. Nginx with php-fpm is a lethal combination for a dynamic web server, and perfect for large scale websites.
+Elastic Beanstalk is a great service, but as the concurrency increases, apache chews up a lot of resources. Nginx with PHP-FPM is a lethal combination for a dynamic web server, and perfect for large scale websites.
 
 Support for a deployment script has also been added. Simply create a deploy.sh script in the root of your application, and it will be run on deployment. Note the script must delete itself at the end, or deployment will fail. You can do this by adding the following to the end of the file:
 
