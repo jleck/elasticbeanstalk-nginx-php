@@ -131,6 +131,8 @@ server {
         fastcgi_param SCRIPT_NAME     $fastcgi_script_name;
         fastcgi_index index.php;
         include fastcgi_params;
+        fastcgi_param PHP_VALUE /etc/php.d/custom.ini;
+        fastcgi_param PHP_VALUE /etc/php.d/environment.ini;
     }
 
     # Cache static files
