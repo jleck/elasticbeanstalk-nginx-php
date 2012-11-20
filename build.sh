@@ -21,7 +21,7 @@ yum -y update
 
 # Overwrite files in /etc and /opt
 mkdir /tmp/build
-git clone git://github.com/rubas/elasticbeanstalk-nginx-php.git /tmp/build
+git clone git://github.com/statichippo/elasticbeanstalk-nginx-php.git /tmp/build
 cp -rf /tmp/build/etc /
 cp -rf /tmp/build/opt /
 
