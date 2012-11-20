@@ -43,6 +43,9 @@ module ElasticBeanstalk
 
           HostManager.log 'Updating Nginx options'
           ElasticBeanstalk::HostManager::Utils::NginxUtil.update_nginx_conf(ElasticBeanstalk::HostManager.config.container['Php.ini Settings'])
+
+          HostManager.log 'Updating Logentries options'
+          ElasticBeanstalk::HostManager::Utils::LogentriesUtil.update_logentries_conf(ElasticBeanstalk::HostManager.config.application['Environment Properties'])
         end
 
         def mark_in_initialization
