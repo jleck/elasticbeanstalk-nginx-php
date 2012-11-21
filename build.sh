@@ -16,6 +16,9 @@ chkconfig nginx off
 yum -y install php54-fpm 
 chkconfig php-fpm off
 
+# Install rsyslog-gnutls
+yum -y install rsyslog-gnutls
+
 # Update all packages
 yum -y update
 
@@ -32,6 +35,7 @@ mv composer.phar /usr/bin/composer
 
 # Take ownership
 chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
+							 /etc/rsyslog.d \
                                            /opt/elasticbeanstalk \
                                            /usr/bin/composer \
                                            /var/log/nginx \
