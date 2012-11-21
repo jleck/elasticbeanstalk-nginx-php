@@ -21,7 +21,7 @@ rm -f /var/www/html/preDeploy.sh
 
 ## Installation
 
-1. Launch an existing PHP Beanstalk AMI in EC2 (not through beanstalk!). Tested with ami-95c6c0e1.
+1. Launch an existing PHP Beanstalk AMI in EC2 (not through beanstalk!). Tested with 'amazon/PHPBeanstalk64-2012.09.01T01.45.48.0000'.
 2. Connect via SSH, and run:
 
 ```bash
