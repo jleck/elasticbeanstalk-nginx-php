@@ -6,6 +6,7 @@ By default PHP on Elastic Beanstalk runs on Apache, which is also a dependancy o
 
 ## Change Log
 21/10/2012: Updated PHP 5.4, thanks to Rubas (https://github.com/rubas)
+
 09/11/2012: Corrected bug with history command
 
 ## Why?
