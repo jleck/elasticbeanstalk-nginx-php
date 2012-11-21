@@ -28,6 +28,14 @@ git clone git://github.com/statichippo/elasticbeanstalk-nginx-php.git /tmp/build
 cp -rf /tmp/build/etc /
 cp -rf /tmp/build/opt /
 
+# Generate self-signed SSL certificate
+openssl genrsa -des3 -passout pass:1234 -out /etc/ssl/certs/server.key 1024
+openssl req -new -config /tmp/build/ssl/openssl.cnf -passin pass:1234 -key /etc/ssl/certs/server.key -out /etc/ssl/certs/server.csr
+mv -f /etc/ssl/certs/server.key /etc/ssl/certs/server.key.org
+openssl rsa -passin pass:1234 -in /etc/ssl/certs/server.key.org -out /etc/ssl/certs/server.key
+openssl x509 -req -days 365 -in /etc/ssl/certs/server.csr -signkey /etc/ssl/certs/server.key -out /etc/ssl/certs/server.crt
+rm -f /etc/ssl/certs/server.key.org /etc/ssl/certs/server.csr
+
 # Install Composer
 cd /tmp/
 curl -s http://getcomposer.org/installer | php

@@ -145,8 +145,16 @@ server {
 CONFIG
           end
 
-          log('Nginx configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/server.conf')
+          log('Nginx server configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/server.conf')
 
+          # copy nginx server.conf to ssl.conf and add the necessary lines to enable ssl
+          `/usr/bin/sudo cp -f /etc/nginx/conf.d/server.conf /etc/nginx/conf.d/ssl.conf`
+          `/usr/bin/sudo sed -i '28i\    listen 443 default_server ssl;' /etc/nginx/conf.d/ssl.conf`
+          `/usr/bin/sudo sed -i '29i\    ssl_certificate \/etc\/ssl\/certs\/server.crt;' /etc/nginx/conf.d/ssl.conf`
+          `/usr/bin/sudo sed -i '30i\    ssl_certificate_key \/etc\/ssl\/certs\/server.key;' /etc/nginx/conf.d/ssl.conf`
+
+          log('Nginx ssl configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/ssl.conf')
+          
           ElasticBeanstalk::HostManager.log(nginx_options)
         end
       end
