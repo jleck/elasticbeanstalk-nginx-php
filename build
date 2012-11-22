@@ -161,9 +161,11 @@ echo 'Correcting permissions'
 /bin/sleep 5
 /bin/chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
                                                 /opt/elasticbeanstalk \
-                                                /usr/bin/composer \
                                                 /var/log/nginx \
                                                 /var/log/php-fpm
+if [ $COMPOSER ]; then
+    /bin/chown -R elasticbeanstalk:elasticbeanstalk /usr/bin/composer
+fi
 
 # Clear unneeded files
 echo ''
