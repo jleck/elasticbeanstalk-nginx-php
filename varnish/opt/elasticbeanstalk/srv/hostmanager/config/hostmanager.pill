@@ -1,0 +1,74 @@
+#############################################################################
+# AWS ElasticBeanstalk Host Manager
+# Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the “License”). You may
+# not use this file except in compliance with the License. A copy of the
+# License is located at
+#
+# http://aws.amazon.com/asl/
+#
+# or in the “license” file accompanying this file. This file is
+# distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+# ANY KIND, express or implied. See the License for the specific
+# language governing permissions and limitations under the License.
+#
+
+#
+# Host Manager bluepill configuration
+#
+
+ELASTICBEANSTALK_HOME = '/opt/elasticbeanstalk'
+THIN_CONFIG = '/opt/elasticbeanstalk/srv/hostmanager/config/hostmanager.yml'
+RACK_CONFIG = '/opt/elasticbeanstalk/srv/hostmanager/config/config.ru'
+
+Bluepill.application('hostmanager', :log_file => "#{ELASTICBEANSTALK_HOME}/var/log/bluepill.log") do |app|
+  app.process('fpm') do |fpm_process|
+    fpm_process.start_command = '/etc/init.d/php-fpm start'
+    fpm_process.stop_command = '/etc/init.d/php-fpm stop'
+    fpm_process.pid_file = '/var/run/php-fpm/php-fpm.pid'
+
+    fpm_process.start_grace_time = 30.seconds
+    fpm_process.stop_grace_time = 30.seconds
+    fpm_process.restart_grace_time = 60.seconds
+    fpm_process.auto_start = false
+  end
+
+  app.process('nginx') do |nginx_process|
+    nginx_process.start_command = '/etc/init.d/nginx start'
+    nginx_process.stop_command = '/etc/init.d/nginx stop'
+    nginx_process.pid_file = '/var/run/nginx.pid'
+
+    nginx_process.start_grace_time = 30.seconds
+    nginx_process.stop_grace_time = 30.seconds
+    nginx_process.restart_grace_time = 60.seconds
+    nginx_process.auto_start = false
+  end
+
+  app.process('varnish') do |varnish_process|
+    varnish_process.start_command = '/etc/init.d/varnish start'
+    varnish_process.stop_command = '/etc/init.d/varnish stop'
+    varnish_process.pid_file = '/var/run/varnish.pid'
+
+    varnish_process.start_grace_time = 30.seconds
+    varnish_process.stop_grace_time = 30.seconds
+    varnish_process.restart_grace_time = 60.seconds
+    varnish_process.auto_start = false
+  end
+
+  app.process('thin') do |thin_process|
+    thin_process.start_command = "bin/thin -C #{THIN_CONFIG} -R #{RACK_CONFIG} start"
+    thin_process.stop_command = "bin/thin -C #{THIN_CONFIG} -R #{RACK_CONFIG} -f stop"
+    thin_process.pid_file = "#{ELASTICBEANSTALK_HOME}/var/state/hostmanager.pid"
+    thin_process.uid = 'elasticbeanstalk'
+    thin_process.gid = 'elasticbeanstalk'
+    thin_process.working_dir = ELASTICBEANSTALK_HOME
+    thin_process.environment = {'HOME' => ELASTICBEANSTALK_HOME}
+
+    thin_process.start_grace_time = 30.seconds
+    thin_process.stop_grace_time = 30.seconds
+    thin_process.restart_grace_time = 60.seconds
+
+    thin_process.checks :mem_usage, :every => 300.seconds, :below => 100.megabytes, :times => 4
+  end
+end
