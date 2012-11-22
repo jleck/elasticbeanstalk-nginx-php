@@ -25,24 +25,11 @@
 
 NFILES=131072
 MEMLOCK=82000
-RELOAD_VCL=1
-VARNISH_VCL_CONF=/etc/varnish/default.vcl
-VARNISH_LISTEN_PORT=80
-VARNISH_ADMIN_LISTEN_ADDRESS=
-VARNISH_ADMIN_LISTEN_PORT=6082
-VARNISH_SECRET_FILE=/etc/varnish/secret
-VARNISH_MIN_THREADS=50
-VARNISH_MAX_THREADS=1000
-VARNISH_THREAD_TIMEOUT=120
-VARNISH_STORAGE_FILE=/var/lib/varnish/varnish_storage.bin
-VARNISH_STORAGE_SIZE=1G
-VARNISH_STORAGE="file,${VARNISH_STORAGE_FILE},${VARNISH_STORAGE_SIZE}"
-VARNISH_TTL=120
-DAEMON_OPTS="-a ${VARNISH_LISTEN_ADDRESS}:${VARNISH_LISTEN_PORT} \
-             -f ${VARNISH_VCL_CONF} \
-             -T ${VARNISH_ADMIN_LISTEN_ADDRESS}:${VARNISH_ADMIN_LISTEN_PORT} \
-             -t ${VARNISH_TTL} \
-             -w ${VARNISH_MIN_THREADS},${VARNISH_MAX_THREADS},${VARNISH_THREAD_TIMEOUT} \
+DAEMON_OPTS="-a :80 \
+             -f /etc/varnish/default.vcl \
+             -T 127.0.0.1:6082 \
+             -t 120 \
+             -w 50,1000,120 \
              -u varnish -g varnish \
-             -S ${VARNISH_SECRET_FILE} \
-             -s ${VARNISH_STORAGE}"
+             -S /etc/varnish/secret \
+             -s 'file,/var/lib/varnish/varnish_storage.bin,1G'"
