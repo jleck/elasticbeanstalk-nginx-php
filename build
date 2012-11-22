@@ -1,0 +1,182 @@
+#!/bin/bash
+#
+# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
+# Copyright 2012 Carbon Coders Ltd
+# 
+# MIT LICENSE
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# 
+
+# Global variables
+FILE=${0##*/}
+OPTIONS=composer,help,varnish,version
+PATH=$(readlink -f $0)
+VERSION=2.0.0
+
+# Parse options
+ARGS=$(/usr/bin/getopt -o hv -l $OPTIONS -n $FILE -- "$@")
+eval set -- "$ARGS"
+
+# Loop options and set flags
+while true; do 
+    case $1 in
+        --composer)   COMPOSER=TRUE;;
+        --varnish)    VARNISH=TRUE;;
+        -h|--help)    echo "Usage: $FILE [options] 
+       $FILE --version
+
+Convert AMI instance from Apache to Nginx/PHP-FPM, and optionally Varnish 
+        
+
+Options:
+  -composer    install Composer, Dependency Manager for PHP
+  -h|--help    show this output
+  -varnish     install Varnish as a reserve proxy
+  -v|--version show version information
+"
+                      exit 0;;
+        -v|--version) echo "$VERSION" exit 0;;
+        *)            break;;
+    esac 
+    shift
+done
+
+# Output header
+echo ''
+echo '# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration'
+echo '# Copyright 2012 Carbon Coders Ltd'
+echo ''
+if [ $COMPOSER ]; then
+    echo 'Composer: Yes'
+else
+    echo 'Composer: No'
+fi
+if [ $VARNISH ];  then
+    echo 'Varnish: Yes'
+else
+    echo 'Varnish: No'
+fi
+/bin/sleep 5
+
+# Remove unneeded packages
+echo ''
+echo 'Removing unneeded packages'
+/bin/sleep 5
+/usr/bin/yum -q -y remove httpd* nginx* php*
+
+# Install Nginx
+echo ''
+echo 'Installing Nginx'
+/bin/sleep 5
+/usr/bin/yum -q -y install nginx
+if [ $? -ne 0 ]; then
+    echo 'Error trying to install Nginx'
+    exit 1
+fi
+/bin/rm -rf /etc/nginx/conf.d/*
+
+# Install Varnish
+if [ $VARNISH ]; then
+    echo ''
+    echo 'Installing Varnish'
+    /bin/sleep 5
+    /usr/bin/yum -q -y install varnish
+    if [ $? -ne 0 ]; then
+        echo 'Error trying to install Varnish'
+        exit 1
+    fi
+fi
+
+# Install PHP 5.4 (with httpd 2.4 as dependency)
+echo ''
+echo 'Installing PHP 5.4 with FPM'
+/bin/sleep 5
+/usr/bin/yum -q -y install php54* --exclude=php54-mysqlnd
+if [ $? -ne 0 ]; then
+    echo 'Error trying to install PHP'
+    exit 1
+fi
+
+# Install Composer
+if [ $COMPOSER ]; then
+    echo ''
+    echo 'Installing Composer'
+    /bin/sleep 5
+    /usr/bin/curl -s http://getcomposer.org/installer | /usr/bin/php -s
+    if [ ! -f 'composer.phar' ]; then
+        echo 'Error downloading Composer'
+        exit 1
+    fi
+    /bin/mv composer.phar /usr/bin/composer
+fi
+
+# Updating packages
+echo ''
+echo 'Updating packages'
+/bin/sleep 5
+/usr/bin/yum -q -y update
+
+# Download files and folders
+echo ''
+echo "Downloading build files and folders"
+/bin/sleep 5
+/bin/rm -rf /tmp/build
+/usr/bin/git clone git://github.com/carboncoders/elasticbeanstalk-nginx-php.git /tmp/build
+
+# Check download was successful
+if [ ! -f '/tmp/build/build' ]; then
+    echo 'Error downloading folders'
+    exit 1
+fi
+
+# Merge folders
+echo 'Merging folders'
+/bin/cp -rf /tmp/build/etc /
+/bin/cp -rf /tmp/build/opt /
+if [ $VARNISH ]; then
+    /bin/cp -rf /tmp/build/varnish/etc /
+    /bin/cp -rf /tmp/build/varnish/opt /
+fi
+
+# Clear unneeded files
+echo ''
+echo 'Clearing unneeded files'
+/bin/sleep 5
+/bin/rm -rf /etc/httpd \
+            /opt/elasticbeanstalk/var/log/* \
+            /tmp/build \
+            /var/log/httpd \
+            /var/log/nginx/* \
+            /var/log/php-fpm/*
+
+# Clear autostarts
+echo 'Clearning autostarts'
+/bin/sleep 5
+/sbin/chkconfig nginx off
+/sbin/chkconfig php-fpm off
+if [ $VARNISH ]; then
+    /sbin/chkconfig varnish off
+fi
+
+# End script
+echo 'Successfully built!'
+/bin/rm -f $PATH
+history -c
+exit 0
