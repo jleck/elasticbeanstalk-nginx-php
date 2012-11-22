@@ -35,7 +35,7 @@ ARGS=$(/usr/bin/getopt -o hv -l $OPTIONS -n $FILE -- "$@")
 eval set -- "$ARGS"
 
 # Loop options and set flags
-while true; do 
+while true; do
     case $1 in
         --composer)   COMPOSER=TRUE;;
         --varnish)    VARNISH=TRUE;;
