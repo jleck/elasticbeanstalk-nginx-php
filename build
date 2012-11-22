@@ -155,6 +155,16 @@ if [ $VARNISH ]; then
     /bin/cp -rf /tmp/build/varnish/opt /
 fi
 
+# Take ownership
+echo ''
+echo 'Correcting permissions'
+/bin/sleep 5
+/bin/chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
+                                                /opt/elasticbeanstalk \
+                                                /usr/bin/composer \
+                                                /var/log/nginx \
+                                                /var/log/php-fpm
+
 # Clear unneeded files
 echo ''
 echo 'Clearing unneeded files'
