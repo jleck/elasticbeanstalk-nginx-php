@@ -14,8 +14,11 @@ Elastic Beanstalk is a great service, but as the concurrency increases, apache c
 Several options are available when running the build script:
 
 --composer       install Composer
+
 -h|--help        show usage guide
+
 --varnish        install Varnish
+
 -v|--version     show build script version
 
 ### Example installation
