@@ -23,8 +23,6 @@
 # SOFTWARE.
 #
 
-Client = unset req.http.Cookie;
-Server = set beresp.ttl = 5d;
 backend default {
     .host = "127.0.0.1";
     .port = "8080";
