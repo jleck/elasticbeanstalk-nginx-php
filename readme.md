@@ -14,8 +14,11 @@ Elastic Beanstalk is a great service, but as the concurrency increases, apache c
 Several options are available when running the build script:
 
 `--composer` install Composer
+
 `-h|--help` show usage guide
+
 `--varnish` install Varnish
+
 `-v|--version` show build script version
 
 Deployment hooks are also available for use, simply create preDeploy.sh and/or postDeploy.sh scripts in the root of your application, and they will be run on deployment. Note the scripts must delete themselves after running, or deployment will fail. You can do this by adding the following to the end of the scripts:
@@ -30,6 +33,7 @@ rm -f ${0##*/}
 2. SSH into the instance and run:
 ```bash
 wget https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build
+
 sudo bash build --composer --varnish
 ```
 3. Exit SSH, and create new image from instance.
