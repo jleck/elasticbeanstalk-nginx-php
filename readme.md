@@ -3,7 +3,7 @@
 
 ## Overview
 
-By default PHP on Elastic Beanstalk runs on Apache, which is also a dependancy of Hostmanager. The goal of this project is to provide an easy way to replace Apache with Nginx, PHP-FPM, and optionally Varnish. Simply transfer the  build script onto a fresh Beanstalk AMI instance, and run using sudo bash.
+By default PHP on Elastic Beanstalk runs on Apache, which is also a dependancy of Hostmanager. The goal of this project is to provide an easy way to replace Apache with Nginx, PHP-FPM, and optionally Varnish. Simply transfer the build script onto a fresh Beanstalk AMI instance, and run using sudo bash.
 
 ## Advantages
 
@@ -20,6 +20,12 @@ Several options are available when running the build script:
 `--varnish` install Varnish
 
 `-v|--version` show build script version
+
+Deployment hooks are also available for use, simply create preDeploy.sh and/or postDeploy.sh scripts in the root of your application, and they will be run on deployment. Note the scripts must delete themselves after running, or deployment will fail. You can do this by adding the following to the end of the scripts:
+
+```bash
+rm -f ${0##*/}
+```
 
 ## Example installation
 
