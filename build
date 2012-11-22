@@ -119,7 +119,7 @@ if [ $COMPOSER ]; then
     echo ''
     echo 'Installing Composer'
     /bin/sleep 5
-    /usr/bin/curl -s http://getcomposer.org/installer | /usr/bin/php -s
+    /usr/bin/curl -s http://getcomposer.org/installer | /usr/bin/php
     if [ ! -f 'composer.phar' ]; then
         echo 'Error downloading Composer'
         exit 1
