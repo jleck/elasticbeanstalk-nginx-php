@@ -29,7 +29,11 @@ rm -f ${0##*/}
 
 ## Example installation
 
+1. Create a new EC2 instance using a Beanstalk AMI (tested on ami-95c6c0e1, PHPBeanstalk64-2012.09.01T01.59.38.000).
+2. SSH into the instance and run:
 ```bash
 wget https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build
 sudo bash build --composer --varnish
 ```
+3. Exit SSH, and create new image from instance.
+4. Set custom Custom AMI ID to newly saved image and relax :)
