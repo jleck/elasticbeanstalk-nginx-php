@@ -28,6 +28,9 @@ backend default {
     .port = "8080";
 }
 sub vcl_recv {
+    if (req.url ~ "^/_hostmanager") {
+        return(pass);
+    }
     unset req.http.Cookie;
     return (lookup); 
 }

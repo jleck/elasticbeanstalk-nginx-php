@@ -36,7 +36,7 @@ server {
     }
 
     # Proxy requests to Hostmanager server
-    location /_hostmanager/ {
+    location /_hostmanager {
         proxy_pass http://127.0.0.1:8999/;
     }
 
