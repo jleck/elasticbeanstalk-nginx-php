@@ -26,7 +26,7 @@
 
 # Global variables
 FILE=${0##*/}
-OPTIONS=composer,help,varnish,version,ssl
+OPTIONS=composer,help,varnish,version,ssl,logentries
 PATH=$(readlink -f $0)
 VERSION=2.0.0
 
@@ -40,6 +40,7 @@ while true; do
         --composer)   COMPOSER=TRUE;;
         --varnish)    VARNISH=TRUE;;
         --ssl)        SSL=TRUE;;
+        --logentries) LOGENTRIES=TRUE;;
         -h|--help)    echo "Usage: $FILE [options] 
        $FILE --version
 
@@ -51,6 +52,7 @@ Options:
   -h|--help    show this output
   -varnish     install Varnish as a reserve proxy
   -ssl         enable ssl
+  -logentries  enable rsyslogging to logentries
   -v|--version show version information
 "
                       exit 0;;
@@ -79,6 +81,11 @@ if [ $SSL ]; then
     echo 'SSL: Yes'
 else
     echo 'SSL: No'
+fi
+if [ $LOGENTRIES ]; then
+    echo 'Logentries: Yes'
+else
+    echo 'Logentries: No'
 fi
 /bin/sleep 5
 
@@ -156,7 +163,8 @@ fi
 # Install SSL
 if [ $SSL ]; then
     echo ''
-    echo 'Generating self-signed SSL certificate'
+    echo 'Generating SSL certificate and modifying nginx startup script'
+    /bin/sleep 5
     /usr/bin/openssl genrsa -des3 -passout pass:1234 -out /etc/ssl/certs/server.key 1024
     /usr/bin/openssl req -new -config /tmp/build/ssl/openssl.cnf -passin pass:1234 -key /etc/ssl/certs/server.key -out /etc/ssl/certs/server.csr
     /bin/mv -f /etc/ssl/certs/server.key /etc/ssl/certs/server.key.org
@@ -168,8 +176,6 @@ if [ $SSL ]; then
         exit 1
     fi
 
-    echo ''
-    echo 'Modifying nginx startup script for SSL'
     # INCEPTION!
     /bin/sed -i "148c\          log('Nginx server configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/server.conf')" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
     /bin/sed -i "149i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
@@ -182,13 +188,32 @@ if [ $SSL ]; then
     /bin/sed -i "146i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
 fi
 
+# Set up log forwarding
+if [ $LOGENTRIES ]; then
+    # Install rsyslog-gnutls to support rsyslog forwarding using TLS
+    echo ''
+    echo 'Setting up rsyslog fowarding for logentries'
+    /bin/sleep 5
+    /usr/bin/yum -q -y install rsyslog-gnutls
+
+    /bin/sed -i "46i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/applications/phpapplication.rb
+    /bin/sed -i "47i\          HostManager.log 'Updating Logentries options'" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/applications/phpapplication.rb
+    /bin/sed -i "48i\          ElasticBeanstalk::HostManager::Utils::LogentriesUtil.update_logentries_conf(ElasticBeanstalk::HostManager.config.application['Environment Properties'])" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/applications/phpapplication.rb
+    /bin/sed -i "26i\require 'elasticbeanstalk/hostmanager/utils/logentriesutil'" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/init-php.rb
+fi
+
 # Merge folders
+echo ''
 echo 'Merging folders'
 /bin/cp -rf /tmp/build/etc /
 /bin/cp -rf /tmp/build/opt /
 if [ $VARNISH ]; then
     /bin/cp -rf /tmp/build/varnish/etc /
     /bin/cp -rf /tmp/build/varnish/opt /
+fi
+if [ $LOGENTRIES ]; then
+    /bin/cp -rf /tmp/build/logentries/etc /
+    /bin/cp -rf /tmp/build/logentries/opt /
 fi
 
 # Take ownership
@@ -201,6 +226,9 @@ echo 'Correcting permissions'
                                                 /var/log/php-fpm
 if [ $COMPOSER ]; then
     /bin/chown -R elasticbeanstalk:elasticbeanstalk /usr/bin/composer
+fi
+if [ $LOGENTRIES ]; then
+    /bin/chown -R elasticbeanstalk:elasticbeanstalk /etc/rsyslog.d
 fi
 
 # Clear unneeded files
