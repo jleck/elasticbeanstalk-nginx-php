@@ -1,0 +1,13 @@
+[ req ]
+default_bits           = 1024
+distinguished_name     = req_distinguished_name
+prompt								= no
+
+[ req_distinguished_name ]
+C                      = XX
+ST                     = XX
+L                      = XX
+O                      = XX
+OU                     = XX
+CN                     = XX
+emailAddress           = local@local.local
