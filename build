@@ -45,7 +45,7 @@ while true; do
         -h|--help)    echo "Usage: $FILE [options] 
        $FILE --version
 
-Convert AMI instance from Apache to Nginx/PHP-FPM, and optionally Varnish 
+Convert AMI instance from Apache to Nginx/PHP-FPM. Optional support for Composer, rsyslogging, Memcache, SSL and Varnish.
         
 
 Options:
