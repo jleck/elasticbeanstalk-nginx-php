@@ -1,5 +1,5 @@
 # AWS Elastic Beanstalk Nginx/PHP-FPM Build
-### Includes optional Varnish cache, Composer, deployment hooks, memcache, SSL and rsyslog forwarding
+### Includes optional Varnish cache, Composer, deployment hooks, Memcache, SSL and rsyslog forwarding
 
 ## Overview
 
@@ -17,11 +17,13 @@ Several options are available when running the build script:
 
 `-h|--help` show usage guide
 
-`--varnish` install Varnish
+`--logentries` enable rsyslog forwarding to logentries
+
+`--memcache` enable Memcache support
 
 `--ssl` enable SSL
 
-`--logentries` enable rsyslog forwarding to logentries
+`--varnish` install Varnish
 
 `-v|--version` show build script version
 
