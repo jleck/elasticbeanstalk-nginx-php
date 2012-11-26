@@ -55,7 +55,6 @@ Options:
   --memcache    enable memcache support
   --ssl         enable ssl
   --varnish     install Varnish as a reserve proxy
-  
   -v|--version show version information
 "
                       exit 0;;
