@@ -26,7 +26,7 @@
 
 # Global variables
 FILE=${0##*/}
-OPTIONS=composer,help,varnish,version,ssl,logentries
+OPTIONS=composer,help,logentries,memcache,ssl,varnish,version
 PATH=$(readlink -f $0)
 VERSION=2.0.0
 
@@ -38,9 +38,10 @@ eval set -- "$ARGS"
 while true; do
     case $1 in
         --composer)   COMPOSER=TRUE;;
-        --varnish)    VARNISH=TRUE;;
-        --ssl)        SSL=TRUE;;
         --logentries) LOGENTRIES=TRUE;;
+        --memcache)   MEMCACHE=TRUE;;
+        --ssl)        SSL=TRUE;;
+        --varnish)    VARNISH=TRUE;;
         -h|--help)    echo "Usage: $FILE [options] 
        $FILE --version
 
@@ -48,11 +49,13 @@ Convert AMI instance from Apache to Nginx/PHP-FPM, and optionally Varnish
         
 
 Options:
-  -composer    install Composer, Dependency Manager for PHP
-  -h|--help    show this output
-  -varnish     install Varnish as a reserve proxy
-  -ssl         enable ssl
-  -logentries  enable rsyslogging to logentries
+  --composer    install Composer, Dependency Manager for PHP
+  -h|--help     show this output
+  --logentries  enable rsyslogging to logentries
+  --memcache    enable memcache support
+  --ssl         enable ssl
+  --varnish     install Varnish as a reserve proxy
+  
   -v|--version show version information
 "
                       exit 0;;
@@ -72,20 +75,25 @@ if [ $COMPOSER ]; then
 else
     echo 'Composer: No'
 fi
-if [ $VARNISH ];  then
-    echo 'Varnish: Yes'
+if [ $LOGENTRIES ]; then
+    echo 'Logentries: Yes'
 else
-    echo 'Varnish: No'
+    echo 'Logentries: No'
+fi
+if [ $MEMCACHE ]; then
+    echo 'Memcache: Yes'
+else
+    echo 'Memcache: No'
 fi
 if [ $SSL ]; then
     echo 'SSL: Yes'
 else
     echo 'SSL: No'
 fi
-if [ $LOGENTRIES ]; then
-    echo 'Logentries: Yes'
+if [ $VARNISH ];  then
+    echo 'Varnish: Yes'
 else
-    echo 'Logentries: No'
+    echo 'Varnish: No'
 fi
 /bin/sleep 5
 
@@ -126,6 +134,18 @@ echo 'Installing PHP 5.4 with FPM'
 if [ $? -ne 0 ]; then
     echo 'Error trying to install PHP'
     exit 1
+fi
+
+# Install Memcache
+if [ $MEMCACHE ]; then
+    echo ''
+    echo 'Installing Memcache'
+    /bin/sleep 5
+    /usr/bin/yum -q -y install memcached
+    if [ $? -ne 0 ]; then
+        echo 'Error trying to install Memcache'
+        exit 1
+    fi
 fi
 
 # Install Composer
