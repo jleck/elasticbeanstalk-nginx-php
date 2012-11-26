@@ -19,6 +19,8 @@ Several options are available when running the build script:
 
 `--varnish` install Varnish
 
+`--ssl` enable SSL
+
 `-v|--version` show build script version
 
 Deployment hooks are also available for use, simply create preDeploy.sh and/or postDeploy.sh scripts in the root of your application, and they will be run on deployment. Note the scripts must delete themselves after running, or deployment will fail. You can do this by adding the following to the end of the scripts:
@@ -26,6 +28,9 @@ Deployment hooks are also available for use, simply create preDeploy.sh and/or p
 ```bash
 rm -f ${0##*/}
 ```
+
+#### More on SSL
+The `--ssl` option creates a copy of the default nginx config with ssl enabled. Encryption is done via a self-signed SSL certificate valid for 1 year from the build script run date. The purpose of this self-signed SSL cert is to encrypt traffic between the Elastic Load Balancer and your instance; *you will still want to install a trusted SSL certificate on your Elastic Load Balancer*. HTTPS traffic will then be encrypted between the browser and Elastic Load Balancer using your trusted certificate, decrypted on the Elastic Load Balancer and re-encrypted between the Elastic Load Balancer using the self signed cert.
 
 ## Example installation
 

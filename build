@@ -26,7 +26,7 @@
 
 # Global variables
 FILE=${0##*/}
-OPTIONS=composer,help,varnish,version
+OPTIONS=composer,help,varnish,version,ssl
 PATH=$(readlink -f $0)
 VERSION=2.0.0
 
@@ -39,6 +39,7 @@ while true; do
     case $1 in
         --composer)   COMPOSER=TRUE;;
         --varnish)    VARNISH=TRUE;;
+        --ssl)        SSL=TRUE;;
         -h|--help)    echo "Usage: $FILE [options] 
        $FILE --version
 
@@ -49,6 +50,7 @@ Options:
   -composer    install Composer, Dependency Manager for PHP
   -h|--help    show this output
   -varnish     install Varnish as a reserve proxy
+  -ssl         enable ssl
   -v|--version show version information
 "
                       exit 0;;
@@ -72,6 +74,11 @@ if [ $VARNISH ];  then
     echo 'Varnish: Yes'
 else
     echo 'Varnish: No'
+fi
+if [ $SSL ]; then
+    echo 'SSL: Yes'
+else
+    echo 'SSL: No'
 fi
 /bin/sleep 5
 
@@ -144,6 +151,35 @@ echo "Downloading build files and folders"
 if [ ! -f '/tmp/build/build' ]; then
     echo 'Error downloading folders'
     exit 1
+fi
+
+# Install SSL
+if [ $SSL ]; then
+    echo ''
+    echo 'Generating self-signed SSL certificate'
+    /usr/bin/openssl genrsa -des3 -passout pass:1234 -out /etc/ssl/certs/server.key 1024
+    /usr/bin/openssl req -new -config /tmp/build/ssl/openssl.cnf -passin pass:1234 -key /etc/ssl/certs/server.key -out /etc/ssl/certs/server.csr
+    /bin/mv -f /etc/ssl/certs/server.key /etc/ssl/certs/server.key.org
+    /usr/bin/openssl rsa -passin pass:1234 -in /etc/ssl/certs/server.key.org -out /etc/ssl/certs/server.key
+    /usr/bin/openssl x509 -req -days 365 -in /etc/ssl/certs/server.csr -signkey /etc/ssl/certs/server.key -out /etc/ssl/certs/server.crt
+    /bin/rm -f /etc/ssl/certs/server.key.org /etc/ssl/certs/server.csr
+    if [ ! -f '/etc/ssl/certs/server.crt' ]; then
+        echo 'Error generating self-signed SSL certificate'
+        exit 1
+    fi
+
+    echo ''
+    echo 'Modifying nginx startup script for SSL'
+    # INCEPTION!
+    /bin/sed -i "148c\          log('Nginx server configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/server.conf')" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "149i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "150i\          # copy nginx server.conf to ssl.conf and add the necessary lines to enable ssl" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "151i\          \`/usr/bin/sudo cp -f /etc/nginx/conf.d/server.conf /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "152i\          \`/usr/bin/sudo sed -i '28i\    listen 443 default_server ssl;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "153i\          \`/usr/bin/sudo sed -i '29i\    ssl_certificate \/etc\/ssl\/certs\/server.crt;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "154i\          \`/usr/bin/sudo sed -i '30i\    ssl_certificate_key \/etc\/ssl\/certs\/server.key;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "155i\          log('Nginx ssl configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/ssl.conf')" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "146i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
 fi
 
 # Merge folders
