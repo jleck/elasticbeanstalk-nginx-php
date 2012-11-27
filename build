@@ -179,6 +179,11 @@ if [ ! -f '/tmp/build/build' ]; then
     exit 1
 fi
 
+# Alter nginx config for varnish
+if [ $VARNISH ]; then
+    /bin/sed -i "110i\    listen 8080;" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+fi
+
 # Install SSL
 if [ $SSL ]; then
     echo ''
@@ -200,11 +205,12 @@ if [ $SSL ]; then
     /bin/sed -i "149i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
     /bin/sed -i "150i\          # copy nginx server.conf to ssl.conf and add the necessary lines to enable ssl" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
     /bin/sed -i "151i\          \`/usr/bin/sudo cp -f /etc/nginx/conf.d/server.conf /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
-    /bin/sed -i "152i\          \`/usr/bin/sudo sed -i '28i\    listen 443 default_server ssl;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
-    /bin/sed -i "153i\          \`/usr/bin/sudo sed -i '29i\    ssl_certificate \/etc\/ssl\/certs\/server.crt;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
-    /bin/sed -i "154i\          \`/usr/bin/sudo sed -i '30i\    ssl_certificate_key \/etc\/ssl\/certs\/server.key;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
-    /bin/sed -i "155i\          log('Nginx ssl configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/ssl.conf')" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
-    /bin/sed -i "146i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "152i\          \`/usr/bin/sudo sed -i '28 d' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb # delete the listen 8080; command
+    /bin/sed -i "153i\          \`/usr/bin/sudo sed -i '28i\    listen 443 default_server ssl;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "154i\          \`/usr/bin/sudo sed -i '29i\    ssl_certificate \/etc\/ssl\/certs\/server.crt;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "155i\          \`/usr/bin/sudo sed -i '30i\    ssl_certificate_key \/etc\/ssl\/certs\/server.key;' /etc/nginx/conf.d/ssl.conf\`" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "156i\          log('Nginx ssl configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/ssl.conf')" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+    /bin/sed -i "157i\ " /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
 fi
 
 # Set up log forwarding
