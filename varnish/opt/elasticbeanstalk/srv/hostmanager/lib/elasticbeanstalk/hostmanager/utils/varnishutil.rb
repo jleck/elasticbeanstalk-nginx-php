@@ -48,6 +48,7 @@ module ElasticBeanstalk
 
         def self.start
           execute_varnish_cmd('start')
+          `/usr/bin/sudo /usr/bin/varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban.url .`
         end
 
         def self.stop
@@ -56,6 +57,7 @@ module ElasticBeanstalk
 
         def self.restart
           execute_varnish_cmd('restart', /Starting Varnish\: \[FAILED\]/)
+          `/usr/bin/sudo /usr/bin/varnishadm -T 127.0.0.1:6082 -S /etc/varnish/secret ban.url .`
         end
 
         def self.status
