@@ -57,7 +57,7 @@ module ElasticBeanstalk
 
                 ElasticBeanstalk::HostManager.log "Configuration options passed to the container: #{ElasticBeanstalk::HostManager.config}"
 
-                ElasticBeanstalk::HostManager::Utils::FPMUtil.restart
+                ElasticBeanstalk::HostManager::Utils::FpmUtil.restart
                 ElasticBeanstalk::HostManager::Utils::NginxUtil.restart
               end
             rescue
