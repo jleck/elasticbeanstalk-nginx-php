@@ -27,7 +27,7 @@ module ElasticBeanstalk
           Event.store(:nginx, 'Restarting the app server', :info, [ :milestone, :nginx ], false)
           HostManager.log 'Restarting the app server'
 
-          ElasticBeanstalk::HostManager::Utils::FPMUtil.restart
+          ElasticBeanstalk::HostManager::Utils::FpmUtil.restart
           ElasticBeanstalk::HostManager::Utils::NginxUtil.restart
 
           generate_response(:deferred)
