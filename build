@@ -26,8 +26,8 @@
 
 # Global variables
 FILE=${0##*/}
-OPTIONS=composer,help,logentries,memcache,ssl,varnish,version
-PATH=$(readlink -f $0)
+OPTIONS=composer,geoip,help,logentries,memcache,ssl,varnish,version
+PATH=$(readlink -f $0):/bin:/usr/bin
 VERSION=2.0.0
 
 # Parse options
@@ -38,6 +38,7 @@ eval set -- "$ARGS"
 while true; do
     case $1 in
         --composer)   COMPOSER=TRUE;;
+        --geoip)      GEOIP=TRUE;;
         --logentries) LOGENTRIES=TRUE;;
         --memcache)   MEMCACHE=TRUE;;
         --ssl)        SSL=TRUE;;
@@ -50,6 +51,7 @@ Convert AMI instance from Apache to Nginx/PHP-FPM. Optional support for Composer
 
 Options:
   --composer    install Composer, Dependency Manager for PHP
+  --geoip       install geoip php module
   -h|--help     show this output
   --logentries  enable rsyslogging to logentries
   --memcache    enable memcache support
@@ -93,6 +95,11 @@ if [ $VARNISH ];  then
     echo 'Varnish: Yes'
 else
     echo 'Varnish: No'
+fi
+if [ $GEOIP ]; then
+    echo 'PHP GeoIP module: Yes'
+else
+    echo 'PHP GeoIP module: No'
 fi
 /bin/sleep 5
 
@@ -227,6 +234,17 @@ if [ $LOGENTRIES ]; then
     /bin/sed -i "26i\require 'elasticbeanstalk/hostmanager/utils/logentriesutil'" /tmp/build/opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/init-php.rb
 fi
 
+# Install geoip
+if [ $GEOIP ]; then
+    /usr/bin/yum -q -y install php54-devel geoip-devel
+    /usr/bin/git clone git://github.com/Zakay/geoip.git /tmp/geoip
+    cd /tmp/geoip
+    /usr/bin/phpize
+    ./configure --with-php-config=/usr/bin/php-config
+    make
+    make install
+fi
+
 # Merge folders
 echo ''
 echo 'Merging folders'
@@ -239,6 +257,9 @@ fi
 if [ $LOGENTRIES ]; then
     /bin/cp -rf /tmp/build/logentries/etc /
     /bin/cp -rf /tmp/build/logentries/opt /
+fi
+if [ $GEOIP ]; then
+    /bin/cp -rf /tmp/build/geoip/etc /
 fi
 
 # Take ownership
@@ -280,4 +301,8 @@ fi
 echo 'Successfully built!'
 /bin/rm -f $PATH
 history -c
+if [ $GEOIP ]; then
+    echo ''
+    echo '** Make sure to copy your GeoIP database(s) to /usr/share/GeoIP/ **'
+fi
 exit 0
