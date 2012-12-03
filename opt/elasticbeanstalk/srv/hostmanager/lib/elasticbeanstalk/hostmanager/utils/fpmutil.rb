@@ -37,7 +37,7 @@ module ElasticBeanstalk
         def self.execute_fpm_cmd(verb, status_regex = /FAILED/)
           log("Executing FPM Command: #{verb}", :info, [ :milestone, :fpm ], false)
 
-          output = `/usr/bin/sudo /etc/init.d/php-pfm #{verb}`
+          output = `/usr/bin/sudo /etc/init.d/php-fpm #{verb}`
 
           if ($?.exitstatus != 0 || output =~ status_regex)
             log("FPM #{verb} FAILED", :critical, [ :fpm ])
