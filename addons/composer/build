@@ -1,7 +1,8 @@
-#############################################################################
-# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
-# Copyright 2012 Carbon Coders Ltd.
+#!/bin/bash
 #
+# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
+# Copyright 2012 Carbon Coders Ltd
+# 
 # MIT LICENSE
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,22 +22,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
+# 
 
-backend default {
-    .host = "127.0.0.1";
-    .port = "8080";
-}
-sub vcl_recv {
-    if (req.url ~ "^/_hostmanager") {
-        return(pass);
-    }
-    unset req.http.Cookie;
-    return (lookup); 
-}
-sub vcl_fetch {
-    if (beresp.http.Set-Cookie) {
-        set beresp.ttl = 5d;
-        return (deliver);
-    }
-}
+# Install Composer
+echo 'Installing Composer'
+/usr/bin/curl -s http://getcomposer.org/installer | /usr/bin/php
+if [ ! -f 'composer.phar' ]; then
+    echo 'Error downloading Composer'
+    exit 1
+fi
+
+# End script
+/bin/mv composer.phar /usr/bin/composer
+/bin/chown -R elasticbeanstalk:elasticbeanstalk /usr/bin/composer
+exit 0
