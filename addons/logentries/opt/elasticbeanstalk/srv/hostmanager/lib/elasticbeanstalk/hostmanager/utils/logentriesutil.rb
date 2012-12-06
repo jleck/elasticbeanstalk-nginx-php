@@ -70,9 +70,8 @@ CONFIG
 
           log('Logentries configuration file failed to be written', :critical, [ :logentries ]) unless ::File.exists?('/etc/rsyslog.d/logentries.conf')
 
-          # restart rsyslog
+          # Restart rsyslog
           `/usr/bin/sudo /etc/init.d/rsyslog restart`
-
           ElasticBeanstalk::HostManager.log(logentries_options)
         end
       end

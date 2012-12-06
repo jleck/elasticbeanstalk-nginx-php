@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
+# Copyright 2012 Carbon Coders Ltd
+# 
+# MIT LICENSE
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# 
+
+# Install SSL
+echo 'Generating SSL certificate and modifying Nginx startup script'
+/usr/bin/openssl genrsa -des3 -passout pass:1234 -out /etc/ssl/certs/server.key 1024
+/usr/bin/openssl req -new -config /tmp/build/addons/ssl/openssl.cnf -passin pass:1234 -key /etc/ssl/certs/server.key -out /etc/ssl/certs/server.csr
+/bin/mv -f /etc/ssl/certs/server.key /etc/ssl/certs/server.key.org
+/usr/bin/openssl rsa -passin pass:1234 -in /etc/ssl/certs/server.key.org -out /etc/ssl/certs/server.key
+/usr/bin/openssl x509 -req -days 365 -in /etc/ssl/certs/server.csr -signkey /etc/ssl/certs/server.key -out /etc/ssl/certs/server.crt
+/bin/rm -f /etc/ssl/certs/server.key.org /etc/ssl/certs/server.csr
+if [ ! -f '/etc/ssl/certs/server.crt' ]; then
+    echo 'Error generating self-signed SSL certificate'
+    exit 1
+fi
+
+# Inception!
+/bin/sed -i "148c\          log('Nginx server configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/server.conf')" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "149i\ " /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "150i\          # copy nginx server.conf to ssl.conf and add the necessary lines to enable ssl" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "151i\          \`/usr/bin/sudo cp -f /etc/nginx/conf.d/server.conf /etc/nginx/conf.d/ssl.conf\`" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "152i\          \`/usr/bin/sudo sed -i '/^\s*listen/ d' /etc/nginx/conf.d/ssl.conf\`" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "153i\          \`/usr/bin/sudo sed -i '28i\    listen 443 default_server ssl;' /etc/nginx/conf.d/ssl.conf\`" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "154i\          \`/usr/bin/sudo sed -i '29i\    ssl_certificate \/etc\/ssl\/certs\/server.crt;' /etc/nginx/conf.d/ssl.conf\`" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "155i\          \`/usr/bin/sudo sed -i '30i\    ssl_certificate_key \/etc\/ssl\/certs\/server.key;' /etc/nginx/conf.d/ssl.conf\`" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "156i\          log('Nginx ssl configuration file failed to be written', :critical, [ :nginx ]) unless ::File.exists?('/etc/nginx/conf.d/ssl.conf')" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+/bin/sed -i "157i\ " /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/utils/nginxutil.rb
+
+# End script
+exit 0

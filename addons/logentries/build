@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
+# Copyright 2012 Carbon Coders Ltd
+# 
+# MIT LICENSE
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# 
+
+# Install rsyslog-gnutls to support rsyslog forwarding using TLS
+echo 'Setting up rsyslog fowarding for logentries'
+/usr/bin/yum -q -y install rsyslog-gnutls
+
+# Alter Hostmanager and merge
+/bin/sed -i "46i\ " /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/applications/phpapplication.rb
+/bin/sed -i "47i\          HostManager.log 'Updating Logentries options'" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/applications/phpapplication.rb
+/bin/sed -i "48i\          ElasticBeanstalk::HostManager::Utils::LogentriesUtil.update_logentries_conf(ElasticBeanstalk::HostManager.config.application['Environment Properties'])" /opt/elasticbeanstalk/srv/hostmanager/lib/elasticbeanstalk/hostmanager/applications/phpapplication.rb
+/bin/cp -rf /tmp/build/addons/logentries/etc /
+/bin/cp -rf /tmp/build/addons/logentries/opt /
+
+# End script
+/bin/chown -R elasticbeanstalk:elasticbeanstalk /etc/rsyslog.d
+/sbin/chkconfig varnish off
+exit 0
