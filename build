@@ -29,13 +29,13 @@ FILE=${0##*/}
 VERSION=3.0.0
 
 # Parse options
-ARGS=$(/usr/bin/getopt -o hv -l addons:,help,verion -n $FILE -- "$@")
+ARGS=$(/usr/bin/getopt -o a:hv -l addons:,help,verion -n $FILE -- "$@")
 eval set -- "$ARGS"
 
 # Loop options and set flags
 while true; do
     case $1 in
-        --addons)     shift
+        -a|--addons)  shift
                       ADDONS=$1;;
         -v|--version) echo "$VERSION"
                       exit 0;;
@@ -45,7 +45,7 @@ while true; do
 Convert AMI instance from Apache to Nginx/PHP-FPM. With support for deployment hooks, Varnish and more through addon packages    
 
 Options:
-  --addons      space seperated list of addons to install
+  -a|--addons   space seperated list of addons to install
   -h|--help     show this output
   -v|--version  show script version
 "
