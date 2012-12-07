@@ -69,9 +69,7 @@ Varnish is a web application accelerator, which can increase content delivery sp
 2. SSH into the instance and run the script, optionally specifying any adons to install:
 
 ```bash
-wget https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build
-
-sudo bash build --addons composer,memcache,varnish
+curl https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build | sudo bash -s --addons composer,memcache,varnish
 ```
 
 3. Exit SSH, and create AMI image from theinstance.
