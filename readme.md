@@ -43,7 +43,7 @@ Several options are available when running the build script:
 Addons can be installed using the `--addons` oprion. Accepts GIT clone urls as well as official addons, for example:
 
 ````bash
-sudo bash build --addons composer git://github.com/user/repo.git
+sudo ./build --addons composer git://github.com/user/repo.git
 ````
 
 Note that cloned repo must contain a `build` file with install commands, or the script will error. Files must also return 0 or the script will error. Official addons include:
