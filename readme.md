@@ -32,7 +32,7 @@ rm -f ${0##*/}
 
 Several options are available when running the build script:
 
-`--addons` comma seperated list of addons to install
+`--addons` space seperated list of addons to install
 
 `-v|--help` show help text
 
@@ -70,7 +70,7 @@ Varnish is a web application accelerator, which can increase content delivery sp
 
 ```bash
 wget https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build
-sudo ./build --addons composer,memcache,varnish
+sudo ./build --addons composer memcache varnish
 ```
 
 3. Exit SSH, and create AMI image from theinstance.
