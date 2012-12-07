@@ -51,11 +51,11 @@ Note that cloned repo must contain a `build` file with install commands, or the 
 #### composer
 Composer is a popular dependency manager for PHP. Make you you run `composer install` in postDeploy.sh to download all required packages. More information can be found [here](http://getcomposer.org).
 
+#### logentries
+Rsyslog forwarding is impelemented for [logentries](http://www.logentries.com). You'll need to create a [*token based input*](https://logentries.com/doc/input-token/) and then configure the `logentries.token` Elastic Beanstalk environment property with that token.
+
 #### memcache
 Memcached is an in-memory key-value store for small chunks of arbitrary data. More information can be found [here](http://memcached.org).
-
-#### rsyslog
-Rsyslog forwarding is impelemented for [logentries](http://www.logentries.com). You'll need to create a [*token based input*](https://logentries.com/doc/input-token/) and then configure the `logentries.token` Elastic Beanstalk environment property with that token.
 
 #### ssl
 The ssl option creates a copy of the default Nginx config with ssl enabled. Encryption is done via a self-signed SSL certificate (valid for 1 year from the build script run date). The purpose of this self-signed SSL cert is to encrypt traffic between the Elastic Load Balancer (ELB) and your instance; *you will still want to install a trusted SSL certificate on your Elastic Load Balancer*. HTTPS traffic will be encrypted between the browser and ELB using your trusted certificate, and re-encrypted between the ELB and AWS instance using the self-signed certificate.
