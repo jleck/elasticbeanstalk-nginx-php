@@ -32,7 +32,7 @@ rm -f ${0##*/}
 
 Several options are available when running the build script:
 
-`--addons` space seperated list of addons to install
+`-a|--addons` space seperated list of addons to install
 
 `-v|--help` show help text
 
