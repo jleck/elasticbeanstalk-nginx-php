@@ -46,7 +46,7 @@ Addons can be installed using the `--addons` oprion. Accepts GIT clone urls as w
 sudo bash build --addons composer git://github.com/user/repo.git
 ````
 
-Note that cloned repo must contain a `build` file with install commands, or the script error. Files must also return 0 or the script will error. Official addons include:
+Note that cloned repo must contain a `build` file with install commands, or the script will error. Files must also return 0 or the script will error. Official addons include:
 
 #### composer
 Composer is a popular dependency manager for PHP. Make you you run `composer install` in postDeploy.sh to download all required packages. More information can be found [here](http://getcomposer.org).
