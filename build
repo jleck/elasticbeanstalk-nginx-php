@@ -156,6 +156,9 @@ echo 'Clearing unneeded files'
             /var/log/nginx/* \
             /var/log/php-fpm/*
 
+# Create symbolic link for logs
+/bin/ln -s /var/log/nginx /var/log/httpd
+
 # Clear autostarts
 echo 'Clearning autostarts'
 /sbin/chkconfig nginx off
