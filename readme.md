@@ -32,7 +32,7 @@ rm -f ${0##*/}
 
 Several options are available when running the build script:
 
-`-a|--addons` space seperated list of addons to install
+`-a|--addons` comma seperated list of addons to install
 
 `-v|--help` show help text
 
@@ -43,7 +43,7 @@ Several options are available when running the build script:
 Addons can be installed using the `--addons` oprion. Accepts GIT clone urls as well as official addons, for example:
 
 ````bash
-sudo ./build --addons composer git://github.com/user/repo.git
+sudo ./build --addons composer,git://github.com/user/repo.git
 ````
 
 Note that cloned repo must contain a `build` file with install commands, or the script will error. Files must also return 0 or the script will error. Official addons include:
@@ -70,7 +70,8 @@ Varnish is a web application accelerator, which can increase content delivery sp
 
 ```bash
 wget https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build
-sudo ./build --addons composer memcache varnish
+chmod +x build
+sudo ./build --addons composer,memcache,varnish
 ```
 
 3. Exit SSH, and create AMI image from theinstance.

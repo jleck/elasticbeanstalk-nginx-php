@@ -45,7 +45,7 @@ while true; do
 Convert AMI instance from Apache to Nginx/PHP-FPM. With support for deployment hooks, Varnish and more through addon packages    
 
 Options:
-  -a|--addons   space seperated list of addons to install
+  -a|--addons   comma seperated list of addons to install
   -h|--help     show this output
   -v|--version  show script version
 "
@@ -59,6 +59,8 @@ done
 echo -e '# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration\n# Copyright 2012 Carbon Coders Ltd'
 if [[ $ADDONS ]]; then
     echo -e "# $ADDONS\n"
+    ADDONS=${ADDONS},
+    IFS=','
 else
     echo -e '# No addons\n'
 fi
@@ -73,7 +75,7 @@ if [ ! -f '/tmp/build/build' ]; then
     exit 1
 fi
 
-# Loop space seperated options
+# Loop comma seperated options
 if [[ $ADDONS ]]; then
     for ADDON in $ADDONS; do
 
