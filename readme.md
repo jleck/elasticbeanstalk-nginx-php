@@ -15,7 +15,13 @@ Deployment hooks are also available. Just add preDeploy.sh/postDeploy.sh to the 
 #!/bin/bash
 #
 # AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
-# Copyright 2012 Carbon Coders Ltd
+#
+# @author    James Leckenby <me@jleck.co.uk>
+# @link      http://jleck.co.uk
+# @copyright 2013 James Leckenby
+# @license   MIT License
+# @version   1.0
+#
 
 # Navigate to containg folder
 FOLDER=`dirname ${0##*/}`
@@ -69,7 +75,7 @@ Varnish is a web application accelerator, which can increase content delivery sp
 2. SSH into the instance and run the script, optionally specifying any adons to install:
 
 ```bash
-wget https://raw.github.com/carboncoders/elasticbeanstalk-nginx-php/master/build
+wget https://raw.github.com/jleck/elasticbeanstalk-nginx-php/master/build
 chmod +x build
 sudo ./build --addons composer,memcache,varnish
 ```

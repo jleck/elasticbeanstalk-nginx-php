@@ -1,5 +1,5 @@
 #############################################################################
-# AWS ElasticBeanstalk Host Manager
+# AWS Elastic Beanstalk Host Manager
 # Copyright 2011 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the “License”). You may

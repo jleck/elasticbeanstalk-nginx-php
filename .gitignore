@@ -1,1 +1,12 @@
+#
+# AWS Elastic Beanstalk Nginx/PHP-FPM Configuration
+#
+# @author    James Leckenby <me@jleck.co.uk>
+# @link      http://jleck.co.uk
+# @copyright 2013 James Leckenby
+# @license   MIT License
+# @version   1.0
+#
+
+# Files to ignore
 .DS_Store
