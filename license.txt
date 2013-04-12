@@ -1,5 +1,6 @@
-Copyright 2013 James Leckenby
-http://jleck.co.uk
+MIT License
+
+Copyright 2013 James Leckenby <me@jleck.co.uk>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
