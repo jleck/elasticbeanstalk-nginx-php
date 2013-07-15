@@ -94,7 +94,7 @@ fi
 
 # Install PHP 5.4 (with httpd 2.4 as dependency)
 echo 'Installing PHP 5.4 with FPM'
-/usr/bin/yum -q -y install php54* --exclude=php54-mysqlnd
+/usr/bin/yum -q -y install php54* --exclude=php54-mysqlnd --skip-broken
 if [ $? -ne 0 ]; then
     echo 'Error trying to install PHP'
     exit 1
