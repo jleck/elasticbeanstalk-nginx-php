@@ -129,7 +129,7 @@ echo 'Updating packages'
 
 # Take ownership
 echo 'Correcting permissions'
-/bin/chown -R elasticbeanstalk:elasticbeanstalk /etc/nginx/conf.d \
+/bin/chown -R root:root /etc/nginx/conf.d \
                                                 /opt/elasticbeanstalk \
                                                 /var/log/nginx \
                                                 /var/log/php-fpm
@@ -152,7 +152,7 @@ echo 'Clearning autostarts'
 /sbin/chkconfig php-fpm off
 
 # End script
-echo 'Successfully built!'
+echo 'Successfully built! with my permissions'
 /bin/rm -f $(readlink -f $0)
 history -c
 exit 0
